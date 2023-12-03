@@ -16,8 +16,6 @@ from . import part1, part2
         [part2.cube_conundrum, "input2.txt", 74804],
     ],
 )
-def test_code_conundrum(
-    func: Callable[[io.TextIOWrapper], int], file: str, result: int
-):
+def test_code_conundrum(func: Callable[[io.TextIOWrapper], int], file: str, result: int):
     with (Path(__file__).parent / "input" / file).open("r") as f:
         assert func(f) == result
