@@ -1,3 +1,4 @@
+import functools
 import io
 import itertools
 from dataclasses import dataclass
@@ -17,7 +18,8 @@ def is_symbol(s: str) -> bool:
     return s != "."
 
 
-def find_part_numbers_in_line(line: str) -> list[PartNumber]:
+@functools.cache
+def find_parts_in_line(line: str) -> list[PartNumber]:
     number = ""
     result = []
     for i, s in enumerate(line):
@@ -61,15 +63,8 @@ def gear_ratios(data: io.TextIOWrapper) -> int:
         prev_line = lines[i - 1].strip() if i > 0 else None
         current_line = line.strip()
         next_line = lines[i + 1].strip() if i < len(lines) - 1 else None
-        part_numbers = find_part_numbers_in_line(current_line)
+        part_numbers = find_parts_in_line(current_line)
         for part_number in part_numbers:
             if is_part_number(part_number, prev_line, current_line, next_line):
                 sum_ += part_number.value
     return sum_
-
-
-if __name__ == "__main__":
-    with open(
-        "/home/longer/repos/advent-of-code/2023/python/day03_gear_ratios/input/input1.txt", "r"
-    ) as f:
-        gear_ratios(f)
