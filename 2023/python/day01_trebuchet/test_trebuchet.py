@@ -11,9 +11,9 @@ from . import part1, part2
     ["func", "file", "result"],
     [
         [part1.trebuchet, "example1.txt", 142],
-        # [part1.trebuchet, "input1.txt", 54605],  # I lost the input data...
+        [part1.trebuchet, "input.txt", 54605],
         [part2.trebuchet, "example2.txt", 281],
-        [part2.trebuchet, "input2.txt", 55429],
+        [part2.trebuchet, "input.txt", 55429],
     ],
 )
 def test_trebuchet(func: Callable[[io.TextIOWrapper], int], file: str, result: int):

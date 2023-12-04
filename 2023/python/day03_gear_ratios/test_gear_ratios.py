@@ -248,9 +248,9 @@ def test_find_adjacent_parts(gear: int, lines: tuple[str, str, str], expected: l
     ["func", "file", "expected"],
     [
         [part1.gear_ratios, "example1.txt", 4361],
-        [part1.gear_ratios, "input1.txt", 546312],
+        [part1.gear_ratios, "input.txt", 546312],
         [part2.gear_ratios, "example2.txt", 467835],
-        [part2.gear_ratios, "input2.txt", 87449461],
+        [part2.gear_ratios, "input.txt", 87449461],
     ],
 )
 def test_gear_ratios(func: Callable[[io.TextIOWrapper], int], file: str, expected: int):
