@@ -42,7 +42,7 @@ def find_adjacent_parts(
     ]
 
 
-def gear_ratios(data: io.TextIOWrapper) -> int:
+def main(data: io.TextIOWrapper) -> int:
     sum_ = 0
     lines = data.readlines()
     for i, line in enumerate(lines):

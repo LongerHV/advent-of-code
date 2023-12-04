@@ -247,10 +247,10 @@ def test_find_adjacent_parts(gear: int, lines: tuple[str, str, str], expected: l
 @pytest.mark.parametrize(
     ["func", "file", "expected"],
     [
-        [part1.gear_ratios, "example.txt", 4361],
-        [part1.gear_ratios, "input.txt", 546312],
-        [part2.gear_ratios, "example.txt", 467835],
-        [part2.gear_ratios, "input.txt", 87449461],
+        [part1.main, "example.txt", 4361],
+        [part1.main, "input.txt", 546312],
+        [part2.main, "example.txt", 467835],
+        [part2.main, "input.txt", 87449461],
     ],
 )
 def test_gear_ratios(func: Callable[[io.TextIOWrapper], int], file: str, expected: int):

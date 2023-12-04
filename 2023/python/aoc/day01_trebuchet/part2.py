@@ -37,5 +37,5 @@ def get_calibration_value_from_line(line: str) -> int:
     return int(f"{digits[0]}{digits[-1]}")
 
 
-def trebuchet(data: io.TextIOWrapper) -> int:
+def main(data: io.TextIOWrapper) -> int:
     return sum(map(get_calibration_value_from_line, data))

@@ -2,7 +2,7 @@ import io
 from collections import defaultdict
 
 
-def scratchcards(data: io.TextIOWrapper) -> int:
+def main(data: io.TextIOWrapper) -> int:
     copies = defaultdict(lambda: 1)
     for i, line in enumerate(data):
         winning, guesses = line.split(":")[1].strip().split("|")

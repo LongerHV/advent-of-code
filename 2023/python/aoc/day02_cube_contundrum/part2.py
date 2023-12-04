@@ -35,5 +35,5 @@ def process_game(line: str) -> int:
     )
 
 
-def cube_conundrum(data: io.TextIOWrapper) -> int:
+def main(data: io.TextIOWrapper) -> int:
     return sum(map(process_game, data))

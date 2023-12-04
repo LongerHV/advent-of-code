@@ -11,6 +11,9 @@
       devShells = forAllSystems (system: {
         default = nixpkgs.legacyPackages.${system}.callPackage ./shell.nix { };
       });
+      packages = forAllSystems (system: {
+        default = nixpkgs.legacyPackages.${system}.callPackage ./default.nix { };
+      });
     };
 }
 

@@ -1,7 +1,7 @@
 import io
 
 
-def scratchcards(data: io.TextIOWrapper) -> int:
+def main(data: io.TextIOWrapper) -> int:
     result = 0
     for line in data:
         winning, guesses = line.split(":")[1].strip().split("|")
