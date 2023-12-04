@@ -11,9 +11,9 @@ from . import part1, part2
     ["func", "file", "result"],
     [
         [part1.scratchcards, "example1.txt", 13],
-        [part1.scratchcards, "input.txt", 0],
-        # [part2.scratchcards, "example2.txt", 0],
-        # [part2.scratchcards, "input.txt", 0],
+        [part1.scratchcards, "input.txt", 26443],
+        [part2.scratchcards, "example2.txt", 30],
+        [part2.scratchcards, "input.txt", 6284877],
     ],
 )
 def test_scratchcards(func: Callable[[io.TextIOWrapper], int], file: str, result: int):
