@@ -54,7 +54,6 @@ def main(data: io.TextIOWrapper) -> int:
     maps = data.read().split("\n\n")
     seeds = parse_seeds(maps[0])
     for category in maps[1:]:
-        print("category:", category)
         map_ = parse_category_map(category)
         seeds = map(map_.get, seeds)
     return min(seeds)
