@@ -41,8 +41,8 @@ def test_min_hold_time(time: int, distance: int, result: int):
     [
         [part1.main, "example.txt", 288],
         [part1.main, "input.txt", 303600],
-        # [part2.main, "example.txt", 0],
-        # [part2.main, "input.txt", 0],
+        [part2.main, "example.txt", 71503],
+        [part2.main, "input.txt", 23654842],
     ],
 )
 def test_wait_for_it(func: Callable[[io.TextIOWrapper], int], file: str, result: int):
