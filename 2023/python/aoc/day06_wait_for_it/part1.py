@@ -1,23 +1,29 @@
 import functools
 import io
+import math
 
 
-def is_winning(time: int, distance: int, hold: int) -> bool:
-    return hold * (time - hold) > distance
+@functools.cache
+def delta(a: int, b: int, c: int) -> float:
+    return b**2 - (4 * a * c)
 
 
 def get_minimum_hold_time(time: int, distance: int) -> int:
-    return next(filter(functools.partial(is_winning, time, distance), range(0, time)))
+    d = delta(1, time, distance)
+    return math.floor((time - math.sqrt(d)) / 2) + 1
 
 
 def get_maximum_hold_time(time: int, distance: int) -> int:
-    return next(filter(functools.partial(is_winning, time, distance), reversed(range(0, time))))
+    d = delta(1, time, distance)
+    return math.ceil((time + math.sqrt(d)) / 2) - 1
 
 
 def get_ways_to_win(time: int, distance: int) -> int:
     return get_maximum_hold_time(time, distance) - get_minimum_hold_time(time, distance) + 1
 
 
+# This solution uses a squere equation:
+# hold_time ^ 2 - time * hold_time + d < 0
 def main(data: io.TextIOWrapper) -> int:
     times_line, distances_line = data.read().strip().split("\n")
     times = map(int, times_line.split()[1:])

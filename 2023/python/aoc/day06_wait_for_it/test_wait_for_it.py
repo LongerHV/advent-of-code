@@ -8,23 +8,6 @@ from . import part1, part2
 
 
 @pytest.mark.parametrize(
-    ["time", "distance", "hold", "result"],
-    [
-        [7, 9, 0, False],
-        [7, 9, 1, False],
-        [7, 9, 2, True],
-        [7, 9, 3, True],
-        [7, 9, 4, True],
-        [7, 9, 5, True],
-        [7, 9, 6, False],
-        [7, 9, 7, False],
-    ],
-)
-def test_is_winning(time: int, distance: int, hold: int, result: bool):
-    assert part1.is_winning(time, distance, hold) == result
-
-
-@pytest.mark.parametrize(
     ["time", "distance", "result"],
     [
         [7, 9, 2],
@@ -34,6 +17,18 @@ def test_is_winning(time: int, distance: int, hold: int, result: bool):
 )
 def test_min_hold_time(time: int, distance: int, result: int):
     assert part1.get_minimum_hold_time(time, distance) == result
+
+
+@pytest.mark.parametrize(
+    ["time", "distance", "result"],
+    [
+        [7, 9, 5],
+        [15, 40, 11],
+        [30, 200, 19],
+    ],
+)
+def test_max_hold_time(time: int, distance: int, result: int):
+    assert part1.get_maximum_hold_time(time, distance) == result
 
 
 @pytest.mark.parametrize(
