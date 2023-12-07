@@ -1,0 +1,15 @@
+on:
+  - push
+
+jobs:
+  test-2023:
+    name: Test 2023 solutions
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v3
+      - uses: DeterminateSystems/nix-installer-action@main
+      - name: Run pytest
+        working-directory: ./2023/python
+        shell: nix develop . --command bash -e {0}
+        run: pytest
