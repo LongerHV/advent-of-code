@@ -12,8 +12,8 @@ from . import part1, part2
     [
         [part1.main, "example.txt", 6440],
         [part1.main, "input.txt", 250946742],
-        # [part2.main, "example.txt", 0],
-        # [part2.main, "input.txt", 0],
+        [part2.main, "example.txt", 5905],
+        [part2.main, "input.txt", 251824095],
     ],
 )
 def test_camel_cards(func: Callable[[io.TextIOWrapper], int], file: str, result: int):
