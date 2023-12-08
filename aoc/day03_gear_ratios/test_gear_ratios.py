@@ -181,7 +181,7 @@ def test_find_gears(line: str, expected: list[int]):
     result = part2.find_gears_in_line(line)
 
     # then
-    assert result == expected
+    assert list(result) == expected
 
 
 @pytest.mark.parametrize(

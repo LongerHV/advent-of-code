@@ -1,14 +1,19 @@
 import io
+from functools import partial
+from itertools import chain, tee
+from typing import Iterable, TypeVar
 
 from .part1 import PartNumber, find_parts_in_line
 
 
-def find_gears_in_line(line: str) -> list[int]:
-    result = []
-    for i, s in enumerate(line):
-        if s == "*":
-            result.append(i)
-    return result
+def find_gears_in_line(line: str) -> Iterable[int]:
+    return map(
+        lambda x: x[0],
+        filter(
+            lambda x: x[1] == "*",
+            enumerate(line),
+        ),
+    )
 
 
 def find_adjacent_parts_in_current_line(gear: int, line: str) -> list[PartNumber]:
@@ -42,18 +47,31 @@ def find_adjacent_parts(
     ]
 
 
-def main(data: io.TextIOWrapper) -> int:
-    sum_ = 0
-    lines = data.readlines()
-    for i, line in enumerate(lines):
-        prev_line = lines[i - 1].strip() if i > 0 else None
-        current_line = line.strip()
-        next_line = lines[i + 1].strip() if i < len(lines) - 1 else None
-        gears = find_gears_in_line(current_line)
-        for gear in gears:
-            parts = find_adjacent_parts(gear, prev_line, current_line, next_line)
-            match parts:
-                case [a, b]:
-                    sum_ += a.value * b.value
+T = TypeVar("T")
 
-    return sum_
+
+def triwise(iterable: Iterable[T]) -> Iterable[tuple[T | None, T, T | None]]:
+    a, b, c = tee(iterable, 3)
+    next(c)
+    return zip(chain([None], a), b, c)
+
+
+def get_gear_ratio(gear: int, lines: tuple[str | None, str, str | None]) -> int:
+    match find_adjacent_parts(gear, *lines):
+        case [a, b]:
+            return a.value * b.value
+        case _:
+            return 0
+
+
+def sum_gear_ratios_in_line(lines: tuple[str | None, str, str | None]) -> int:
+    return sum(
+        map(
+            partial(get_gear_ratio, lines=lines),
+            find_gears_in_line(lines[1]),
+        )
+    )
+
+
+def main(data: io.TextIOWrapper) -> int:
+    return sum(map(sum_gear_ratios_in_line, triwise(data)))

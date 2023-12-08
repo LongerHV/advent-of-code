@@ -1,13 +1,11 @@
 import io
 
 
+def scratch_card(card: str) -> int:
+    winning, guesses = card.split(":")[1].strip().split("|")
+    common = set(map(int, winning.strip().split())) & set(map(int, guesses.strip().split()))
+    return 2 ** (len(common) - 1) if common else 0
+
+
 def main(data: io.TextIOWrapper) -> int:
-    result = 0
-    for line in data:
-        winning, guesses = line.split(":")[1].strip().split("|")
-        winning = set(map(int, winning.strip().split()))
-        guesses = set(map(int, guesses.strip().split()))
-        common = guesses & winning
-        if common:
-            result += 2 ** (len(common) - 1)
-    return result
+    return sum(map(scratch_card, data))
