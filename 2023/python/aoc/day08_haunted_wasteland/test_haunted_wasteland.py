@@ -13,8 +13,8 @@ from . import part1, part2
         [part1.main, "example1.txt", 2],
         [part1.main, "example2.txt", 6],
         [part1.main, "input.txt", 17263],
-        # [part2.main, "example.txt", 0],
-        # [part2.main, "input.txt", 0],
+        [part2.main, "example3.txt", 6],
+        [part2.main, "input.txt", 14631604759649],
     ],
 )
 def test_haunted_wasteland(func: Callable[[io.TextIOWrapper], int], file: str, result: int):
