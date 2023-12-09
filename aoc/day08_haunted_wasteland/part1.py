@@ -1,7 +1,9 @@
 import io
-from functools import partial, reduce
+from functools import partial
 from itertools import cycle, takewhile
-from typing import Callable, Generator, Iterable, Mapping, NamedTuple, TypeVar
+from typing import Callable, Iterable, Mapping, NamedTuple, TypeVar
+
+from more_itertools import ilen
 
 
 class Directions(NamedTuple):
@@ -22,8 +24,7 @@ def parse_line(line: str) -> tuple[str, Directions]:
 
 
 def parse_map(data: Iterable[str]) -> Mapping[str, Directions]:
-    m = list(map(parse_line, data))
-    return {k: v for k, v in m}
+    return dict(map(parse_line, data))
 
 
 def make_step(map_: Mapping[str, Directions], position: str, step: str) -> str:
@@ -39,7 +40,7 @@ def pass_map(
     predicate: Callable[[T, V], T],
     iterable: Iterable[V],
     initial: T,
-) -> Generator[T, None, None]:
+) -> Iterable[T]:
     """Map function on elements of iterable,
     additionally passing result of last iteration as a first argument
     """
@@ -53,8 +54,7 @@ def main(data: io.TextIOWrapper) -> int:
     steps = data.readline().strip()
     data.readline()
     make_step_ = partial(make_step, parse_map(data))
-    return reduce(
-        lambda acc, _: acc + 1,
+    return 1 + ilen(
         takewhile(
             lambda x: x != "ZZZ",
             pass_map(
@@ -63,5 +63,4 @@ def main(data: io.TextIOWrapper) -> int:
                 "AAA",
             ),
         ),
-        1,
     )

@@ -6,6 +6,7 @@ buildPythonApplication {
   version = "2023";
   pyproject = true;
   nativeBuildInputs = [
+    more-itertools
     setuptools
     wheel
   ];

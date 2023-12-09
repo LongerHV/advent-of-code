@@ -2,6 +2,8 @@ import io
 from functools import partial, reduce
 from itertools import cycle, takewhile
 
+from more_itertools import ilen
+
 from .part1 import make_step, parse_map, pass_map
 
 
@@ -19,23 +21,22 @@ def main(data: io.TextIOWrapper) -> int:
     map_ = parse_map(data)
     make_step_ = partial(make_step, map_)
     ghost_cycles = map(
-        lambda initial_position: reduce(
-            lambda acc, _: acc + 1,
+        lambda initial_position: 1
+        + ilen(
             takewhile(
-                lambda x: not x.endswith("Z"),
+                lambda x: not x.endswith("Z"),  # type: ignore
                 pass_map(
                     lambda position, step: make_step_(position, step),
                     cycle(steps),
                     initial_position,
                 ),
             ),
-            1,
         ),
         filter(lambda s: s.endswith("A"), map_.keys()),
     )
     prime_factors = reduce(
         lambda acc, p: acc | p,
-        map(set, map(prime_factor, ghost_cycles)),
+        map(set[int], map(prime_factor, ghost_cycles)),
         set[int](),
     )
     return reduce(lambda acc, p: acc * p, prime_factors, 1)

@@ -6,6 +6,7 @@ in
 pkgs.mkShell {
   buildInputs = with pythonPackages; [
     python
+    more-itertools
     pytest
     black
     isort
