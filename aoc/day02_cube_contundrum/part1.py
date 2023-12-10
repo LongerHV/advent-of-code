@@ -14,7 +14,7 @@ BAG = defaultdict(
 
 
 class Record(NamedTuple):
-    count: int
+    count_: int
     color: str
 
 

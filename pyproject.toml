@@ -6,7 +6,7 @@ version = "2023"
 aoc = "aoc.main:main"
 
 [tool.pylama]
-ignore = "E203"
+ignore = "E203,C901"
 
 [tool.pylama.linter.pycodestyle]
 max_line_length = 100

@@ -18,10 +18,10 @@ BAG = defaultdict(
 def process_color(color: str, flat_game: list[Record]) -> int:
     color_occurences = list(filter(lambda record: record.color == color, flat_game))
     if len(color_occurences) > 1:
-        largest = max(*color_occurences, key=lambda record: record.count)
+        largest = max(*color_occurences, key=lambda record: record.count_)
     else:
         largest = color_occurences[0]
-    return largest.count
+    return largest.count_
 
 
 def process_game(line: str) -> int:

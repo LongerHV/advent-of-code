@@ -1,0 +1,20 @@
+on:
+  push:
+    branches:
+      - "2023"
+
+jobs:
+  lint-2023:
+    name: Run linters
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: nix develop . --command bash -e {0}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: DeterminateSystems/nix-installer-action@main
+      - run: pylama .
+      - run: isort --check .
+      - run: black --check .
+      - run: mypy aoc
