@@ -4,7 +4,7 @@ from typing import Callable
 
 import pytest
 
-from . import part1  # , part2
+from . import part1, part2
 
 
 @pytest.mark.parametrize(
@@ -12,8 +12,8 @@ from . import part1  # , part2
     [
         [part1.main, "example.txt", 405],
         [part1.main, "input.txt", 36041],
-        # [part2.main, "example.txt", 400],
-        # [part2.main, "input.txt", 0],
+        [part2.main, "example.txt", 400],
+        [part2.main, "input.txt", 35915],
     ],
 )
 def test_point_of_incidence(func: Callable[[io.TextIOWrapper], int], file: str, result: int):
