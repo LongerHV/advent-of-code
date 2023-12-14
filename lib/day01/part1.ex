@@ -1,4 +1,4 @@
-defmodule Day01part1 do
+defmodule Aoc.Day01part1 do
   def main(data) do
     is_digit = fn s -> s >= 48 and s < 58 end
 
