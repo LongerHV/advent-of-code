@@ -4,7 +4,7 @@ from typing import Callable
 
 import pytest
 
-from . import part1  # , part2
+from . import part1, part2
 
 
 @pytest.mark.parametrize(
@@ -12,8 +12,8 @@ from . import part1  # , part2
     [
         [part1.main, "example.txt", 62],
         [part1.main, "input.txt", 40761],
-        # [part2.main, "example.txt", 0],
-        # [part2.main, "input.txt", 0],
+        [part2.main, "example.txt", 952408144115],
+        [part2.main, "input.txt", 106920098354636],
     ],
 )
 def test_lavaduct_lagoon(func: Callable[[io.TextIOWrapper], int], file: str, result: int):
