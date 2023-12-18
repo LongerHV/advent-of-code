@@ -1,6 +1,6 @@
 import io
 
-from .part1 import Vector, get_points, shoelace
+from .part1 import Vector, count_cubes, get_points
 
 DIRECTIONS: dict[str, Vector] = {
     "0": (0, 1),
@@ -10,14 +10,17 @@ DIRECTIONS: dict[str, Vector] = {
 }
 
 
-def parse_input(data: io.TextIOWrapper) -> list[Vector]:
-    steps = map(
-        lambda s: (int(s[:-1], 16), DIRECTIONS[s[-1]]),
-        (s.strip().split()[-1].removeprefix("(#").removesuffix(")") for s in data),
+def parse_input(data: io.TextIOWrapper) -> tuple[list[tuple[int, Vector]], list[Vector]]:
+    steps = list(
+        map(
+            lambda s: (int(s[:-1], 16), DIRECTIONS[s[-1]]),
+            (s.strip().split()[-1].removeprefix("(#").removesuffix(")") for s in data),
+        )
     )
 
-    return get_points(steps)
+    return steps, get_points(steps)
 
 
 def main(data: io.TextIOWrapper) -> int:
-    return shoelace(parse_input(data))
+    steps, points = parse_input(data)
+    return count_cubes(steps, points)
