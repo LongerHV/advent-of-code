@@ -1,16 +1,10 @@
 import io
+from enum import Enum
 from functools import reduce
+from itertools import pairwise, tee
+from typing import Iterable
 
 Vector = tuple[int, int]
-
-
-def add_vectors(a: Vector, b: Vector) -> Vector:
-    return a[0] + b[0], a[1] + b[1]
-
-
-def mul_vector(a: Vector, scalar: int) -> Vector:
-    return a[0] * scalar, a[1] * scalar
-
 
 DIRECTIONS: dict[str, Vector] = {
     "U": (-1, 0),
@@ -20,37 +14,71 @@ DIRECTIONS: dict[str, Vector] = {
 }
 
 
-def find_start(duct: list[list[str]]) -> Vector:
-    return (1, duct[1].index("#") + 1)
+class Rotation(Enum):
+    CW = 1
+    CCW = 0
+
+
+ROTATION: dict[tuple[Vector, Vector], Rotation] = {
+    ((-1, 0), (0, 1)): Rotation.CW,
+    ((0, 1), (1, 0)): Rotation.CW,
+    ((1, 0), (0, -1)): Rotation.CW,
+    ((0, -1), (-1, 0)): Rotation.CW,
+    ((-1, 0), (0, -1)): Rotation.CCW,
+    ((0, -1), (1, 0)): Rotation.CCW,
+    ((1, 0), (0, 1)): Rotation.CCW,
+    ((0, 1), (-1, 0)): Rotation.CCW,
+}
+
+
+def advance(start: Vector, direction: Vector, distance: int) -> Vector:
+    return start[0] + (distance * direction[0]), start[1] + (distance * direction[1])
+
+
+def get_next_point(
+    acc: tuple[list[Vector], Vector, Rotation],
+    x: tuple[tuple[int, Vector], tuple[int, Vector]],
+) -> tuple[list[Vector], Vector, Rotation]:
+    vertices, prev, last_rotation = acc
+    (distance, direction), (_, next_direction) = x
+    next_rotation = ROTATION[(direction, next_direction)]
+    match (last_rotation, next_rotation):
+        case (Rotation.CW, Rotation.CW):
+            offset = 1
+        case (Rotation.CCW, Rotation.CCW):
+            offset = -1
+        case _:
+            offset = 0
+    next_point = advance(prev, direction, distance + offset)
+    return vertices + [next_point], next_point, next_rotation
+
+
+def get_points(steps: Iterable[tuple[int, Vector]]) -> list[Vector]:
+    origin: Vector = (0, 0)
+    steps_a, steps_b = tee(steps)
+    next(steps_b)
+    return reduce(get_next_point, zip(steps_a, steps_b), ([origin], origin, Rotation.CW))[0]
+
+
+def parse_input(data: io.TextIOWrapper) -> list[Vector]:
+    steps = map(lambda x: (int(x[1]), DIRECTIONS[x[0]]), (x.strip().split() for x in data))
+    return get_points(steps)
+
+
+def determinant(a: Vector, b: Vector) -> int:
+    return -(a[0] * b[1]) + (a[1] * b[0])
+
+
+def shoelace(vertices: list[Vector]) -> int:
+    return (
+        reduce(
+            lambda acc, v: acc + determinant(v[0], v[1]),
+            pairwise(vertices),
+            0,
+        )
+        // 2
+    )
 
 
 def main(data: io.TextIOWrapper) -> int:
-    instructions = map(lambda x: (DIRECTIONS[x[0]], int(x[1])), (x.strip().split() for x in data))
-    current: Vector = (0, 0)
-    dug: set[Vector] = {current}
-    for direction, length in instructions:
-        dug |= {add_vectors(current, mul_vector(direction, i)) for i in range(1, length + 1)}
-        current = add_vectors(current, mul_vector(direction, length))
-    x_offset = min(dug, key=lambda x: x[0])[0]
-    y_offset = min(dug, key=lambda x: x[1])[1]
-    dug = {add_vectors(x, (-x_offset, -y_offset)) for x in dug}
-    rows = max(dug, key=lambda x: x[0])[0] + 1
-    cols = max(dug, key=lambda x: x[1])[1] + 1
-    lava_duct = [[("#" if (i, j) in dug else ".") for j in range(cols)] for i in range(rows)]
-    to_fill: set[Vector] = {find_start(lava_duct)}
-    while to_fill:
-        tile = to_fill.pop()
-        x, y = tile
-        lava_duct[x][y] = "#"
-        for direction in DIRECTIONS.values():
-            next_x, next_y = add_vectors(tile, direction)
-            if next_x < 0 or next_y < 0 or next_x >= rows or next_y >= cols:
-                continue
-            if lava_duct[next_x][next_y] == ".":
-                to_fill.add((next_x, next_y))
-
-    return reduce(
-        lambda acc, x: acc + "".join(x).count("#"),
-        lava_duct,
-        0,
-    )
+    return shoelace(parse_input(data))
