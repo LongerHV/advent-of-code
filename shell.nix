@@ -13,5 +13,5 @@ pkgs.mkShell {
     pylama
     setuptools
     toml
-  ];
+  ] ++ [ pkgs.gnupg ];
 }

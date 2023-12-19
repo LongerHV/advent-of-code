@@ -1,3 +1,5 @@
+aoc/*/input/*.txt
+
 # Created by https://www.toptal.com/developers/gitignore/api/python,direnv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,direnv
 
