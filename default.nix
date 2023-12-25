@@ -7,6 +7,7 @@ buildPythonApplication {
   pyproject = true;
   nativeBuildInputs = [
     more-itertools
+    networkx
     setuptools
     wheel
   ];

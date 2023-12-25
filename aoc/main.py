@@ -11,8 +11,8 @@ import aoc
 def solve_puzzle(module, args: SimpleNamespace):
     try:
         main = import_module(f"{aoc.__name__}.{module.name}.part{args.part}").main
-    except AttributeError:
-        print(f"{module.name.capitalize()} part{args.part} is not implemented yet")
+    except (AttributeError, ModuleNotFoundError):
+        print(f"{module.name.capitalize()} part{args.part} is not implemented")
         exit(1)
     print(main(args.input))
 
