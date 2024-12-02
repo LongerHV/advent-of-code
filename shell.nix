@@ -5,5 +5,6 @@ pkgs.mkShell {
     gleam
     erlang_27
     rebar3
+    gnupg
   ];
 }
