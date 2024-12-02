@@ -7,7 +7,13 @@ import gleam/string
 import simplifile
 
 type Array =
-  List(List(Int))
+  List(Row)
+
+type Row =
+  List(Int)
+
+type Pairs =
+  List(#(Int, Int))
 
 pub type Error {
   ReadError(simplifile.FileError)
@@ -36,7 +42,7 @@ fn map_parse_int(in: List(String)) -> Result(List(Int), Error) {
   |> result.map_error(NilError)
 }
 
-fn is_ascending(row: List(#(Int, Int))) -> Bool {
+fn is_ascending(row: Pairs) -> Bool {
   row
   |> list.map(fn(p) {
     let diff = pair.first(p) - pair.second(p)
@@ -45,7 +51,7 @@ fn is_ascending(row: List(#(Int, Int))) -> Bool {
   |> list.all(function.identity)
 }
 
-fn is_descending(row: List(#(Int, Int))) -> Bool {
+fn is_descending(row: Pairs) -> Bool {
   row
   |> list.map(fn(p) {
     let diff = pair.second(p) - pair.first(p)
@@ -58,8 +64,41 @@ pub fn part1(filepath: String) -> Result(Int, Error) {
   use data <- result.try(read_file(filepath))
 
   data
-  |> list.map(list.window_by_2)
-  |> list.filter(fn(x) { is_ascending(x) || is_descending(x) })
+  |> list.filter(fn(row) {
+    let windowed_row = list.window_by_2(row)
+    is_ascending(windowed_row) || is_descending(windowed_row)
+  })
+  |> list.length
+  |> Ok
+}
+
+fn generate_slices(in: Row) -> List(Row) {
+  list.range(from: 1, to: list.length(in))
+  |> list.map(fn(i) { list.append(list.take(in, i - 1), list.drop(in, i)) })
+}
+
+fn is_safe_with_toleration(in: Row, check: fn(Pairs) -> Bool) -> Bool {
+  in
+  |> generate_slices
+  |> list.map(fn(slice) {
+    slice
+    |> list.window_by_2
+    |> check
+  })
+  |> list.any(function.identity)
+}
+
+pub fn part2(filepath: String) -> Result(Int, Error) {
+  use data <- result.try(read_file(filepath))
+
+  data
+  |> list.filter(fn(row) {
+    let windowed_row = list.window_by_2(row)
+    is_ascending(windowed_row)
+    || is_descending(windowed_row)
+    || is_safe_with_toleration(row, is_ascending)
+    || is_safe_with_toleration(row, is_descending)
+  })
   |> list.length
   |> Ok
 }
