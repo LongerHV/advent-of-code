@@ -1,0 +1,23 @@
+on:
+  push:
+    branches:
+      - "master"
+      - "2024"
+
+jobs:
+  test-2024:
+    name: Test 2024 solutions
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: nix develop . --command bash -e {0}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: DeterminateSystems/nix-installer-action@main
+      - name: Decrypt inputs
+        env:
+          GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+        run: ./decrypt_inputs.sh
+      - name: Run tests
+        run: gleam test
