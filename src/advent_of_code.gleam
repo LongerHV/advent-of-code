@@ -1,9 +1,9 @@
 import gleam/io
-import day1
+import day2
 
 pub fn main() {
-  // let filepath = "data/day1_exercise.txt"
-  let filepath = "data/day1_example.txt"
-  day1.part1(filepath)
+  // let filepath = "data/day2_example.txt"
+  let filepath = "data/day2_exercise.txt"
+  day2.part1(filepath)
   |> io.debug()
 }
