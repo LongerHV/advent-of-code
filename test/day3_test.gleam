@@ -11,12 +11,12 @@ pub fn part_1_exercise_test() {
   |> should.equal(Ok(162813399))
 }
 
-// pub fn part_2_example_test() {
-//   day3.part2("data/day3_example.txt")
-//   |> should.equal(Ok(0))
-// }
-//
-// pub fn part_2_exercise_test() {
-//   day3.part2("data/day3_exercise.txt")
-//   |> should.equal(Ok(0))
-// }
+pub fn part_2_example_test() {
+  day3.part2("data/day3_example2.txt")
+  |> should.equal(Ok(48))
+}
+
+pub fn part_2_exercise_test() {
+  day3.part2("data/day3_exercise.txt")
+  |> should.equal(Ok(53783319))
+}
