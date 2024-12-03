@@ -1,4 +1,5 @@
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/option
 import gleam/pair
@@ -81,7 +82,18 @@ pub fn tokenize(in: List(String), tokens: List(Token)) -> List(Token) {
           let assert Ok(n) = int.parse(digits)
           recurse(in, string.length(digits), tokens, Number(n))
         }
-        False -> recurse(in, 1, tokens, Garbage(s))
+        False -> {
+          let chars = case list.take_while(in, fn(c) { c != "d" && c != "m" }) {
+            [] -> list.take(in, up_to: 1)
+            c -> c
+          }
+          recurse(
+            in,
+            list.length(chars),
+            tokens,
+            Garbage(string.join(chars, "")),
+          )
+        }
       }
     }
   }
