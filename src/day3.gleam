@@ -1,4 +1,5 @@
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/option
 import gleam/pair
@@ -39,36 +40,68 @@ pub fn part1(filepath: String) -> Result(Int, DayError) {
   |> Ok
 }
 
-fn parse_mul(in: String) -> #(option.Option(#(Int, Int)), String) {
-  let assert Ok(re) =
-    regexp.from_string("^mul\\((\\d\\d?\\d?),(\\d\\d?\\d?)\\)")
-  let matches =
-    re
-    |> regexp.scan(in)
+pub type Token {
+  Number(Int)
+  Garbage(String)
+  Comma
+  LParen
+  RParen
+  Mul
+  Do
+  Dont
+}
 
-  case matches {
-    [regexp.Match(content, [option.Some(a), option.Some(b)])] -> {
-      let len = string.length(content)
-      let assert #(Ok(x), Ok(y)) = #(int.parse(a), int.parse(b))
-      #(option.Some(#(x, y)), string.slice(in, len, string.length(in) - len))
+pub fn tokenize(in: String, tokens: List(Token)) -> List(Token) {
+  let recurse = fn(in: String, s: String, tokens: List(Token), token: Token) {
+    in
+    |> string.drop_start(up_to: string.length(s))
+    |> tokenize(list.append(tokens, [token]))
+  }
+
+  case in {
+    "" -> tokens
+    "don't" as s <> _ -> recurse(in, s, tokens, Dont)
+    "do" as s <> _ -> recurse(in, s, tokens, Do)
+    "mul" as s <> _ -> recurse(in, s, tokens, Mul)
+    "(" as s <> _ -> recurse(in, s, tokens, LParen)
+    ")" as s <> _ -> recurse(in, s, tokens, RParen)
+    "," as s <> _ -> recurse(in, s, tokens, Comma)
+    "0" <> _
+    | "1" <> _
+    | "2" <> _
+    | "3" <> _
+    | "4" <> _
+    | "5" <> _
+    | "6" <> _
+    | "7" <> _
+    | "8" <> _
+    | "9" <> _ -> {
+      let assert Ok(n) =
+        result.or(
+          int.parse(string.slice(in, at_index: 0, length: 3)),
+          result.or(
+            int.parse(string.slice(in, at_index: 0, length: 2)),
+            int.parse(string.slice(in, at_index: 0, length: 1)),
+          ),
+        )
+      recurse(in, int.to_string(n), tokens, Number(n))
     }
-    _ -> #(option.None, string.slice(in, 1, string.length(in) - 1))
+    _ -> {
+      let s = string.slice(in, at_index: 0, length: 1)
+      recurse(in, s, tokens, Garbage(s))
+    }
   }
 }
 
-fn parse(in: String, do: Bool, pairs: List(#(Int, Int))) -> List(#(Int, Int)) {
-  case in {
-    "mul(" <> _ if do -> {
-      let #(p, rest) = parse_mul(in)
-      case p {
-        option.Some(pp) -> parse(rest, do, list.append(pairs, [pp]))
-        option.None -> parse(rest, do, list.append(pairs, []))
-      }
+fn compute(tokens: List(Token), do: Bool) -> Int {
+  case tokens {
+    [] -> 0
+    [Mul, LParen, Number(a), Comma, Number(b), RParen, ..rest] if do -> {
+      a * b + compute(rest, do)
     }
-    "do()" <> rest -> parse(rest, True, pairs)
-    "don't()" <> rest -> parse(rest, False, pairs)
-    "" -> pairs
-    s -> parse(string.slice(s, 1, string.length(s) - 1), do, pairs)
+    [Do, LParen, RParen, ..other] -> compute(other, True)
+    [Dont, LParen, RParen, ..other] -> compute(other, False)
+    [_, ..other] -> compute(other, do)
   }
 }
 
@@ -80,8 +113,7 @@ pub fn part2(filepath: String) -> Result(Int, DayError) {
   )
 
   content
-  |> parse(True, [])
-  |> list.map(fn(p) { pair.first(p) * pair.second(p) })
-  |> int.sum
+  |> tokenize([])
+  |> compute(True)
   |> Ok
 }
