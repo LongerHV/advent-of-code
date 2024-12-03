@@ -1,15 +1,16 @@
-import day3.{Comma, Do, Dont, Garbage, LParen, Mul, Number, RParen, tokenize, part1}
+import day3.{Comma, Do, Dont, Garbage, LParen, Mul, Number, RParen}
+import gleam/string
 import gleeunit/should
 
-// pub fn part_1_example_test() {
-//   day3.part1("data/day3_example.txt")
-//   |> should.equal(Ok(161))
-// }
-//
-// pub fn part_1_exercise_test() {
-//   day3.part1("data/day3_exercise.txt")
-//   |> should.equal(Ok(162_813_399))
-// }
+pub fn part_1_example_test() {
+  day3.part1("data/day3_example.txt")
+  |> should.equal(Ok(161))
+}
+
+pub fn part_1_exercise_test() {
+  day3.part1("data/day3_exercise.txt")
+  |> should.equal(Ok(162_813_399))
+}
 
 pub fn part_2_example_test() {
   day3.part2("data/day3_example2.txt")
@@ -21,9 +22,11 @@ pub fn part_2_exercise_test() {
   |> should.equal(Ok(53_783_319))
 }
 
-pub fn lexer_test() {
+pub fn tokenizer_test() {
   day3.tokenize(
-    "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))",
+    string.to_graphemes(
+      "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))",
+    ),
     [],
   )
   |> should.equal([

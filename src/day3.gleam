@@ -1,5 +1,4 @@
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/option
 import gleam/pair
@@ -51,45 +50,47 @@ pub type Token {
   Dont
 }
 
-pub fn tokenize(in: String, tokens: List(Token)) -> List(Token) {
-  let recurse = fn(in: String, s: String, tokens: List(Token), token: Token) {
+pub fn tokenize(in: List(String), tokens: List(Token)) -> List(Token) {
+  let recurse = fn(
+    in: List(String),
+    offset: Int,
+    tokens: List(Token),
+    token: Token,
+  ) {
     in
-    |> string.drop_start(up_to: string.length(s))
+    |> list.drop(up_to: offset)
     |> tokenize(list.append(tokens, [token]))
   }
 
   case in {
-    "" -> tokens
-    "don't" as s <> _ -> recurse(in, s, tokens, Dont)
-    "do" as s <> _ -> recurse(in, s, tokens, Do)
-    "mul" as s <> _ -> recurse(in, s, tokens, Mul)
-    "(" as s <> _ -> recurse(in, s, tokens, LParen)
-    ")" as s <> _ -> recurse(in, s, tokens, RParen)
-    "," as s <> _ -> recurse(in, s, tokens, Comma)
-    "0" <> _
-    | "1" <> _
-    | "2" <> _
-    | "3" <> _
-    | "4" <> _
-    | "5" <> _
-    | "6" <> _
-    | "7" <> _
-    | "8" <> _
-    | "9" <> _ -> {
-      let assert Ok(n) =
-        result.or(
-          int.parse(string.slice(in, at_index: 0, length: 3)),
-          result.or(
-            int.parse(string.slice(in, at_index: 0, length: 2)),
-            int.parse(string.slice(in, at_index: 0, length: 1)),
-          ),
-        )
-      recurse(in, int.to_string(n), tokens, Number(n))
+    [] -> tokens
+    ["d", "o", "n", "'", "t", ..] -> recurse(in, 5, tokens, Dont)
+    ["d", "o", ..] -> recurse(in, 2, tokens, Do)
+    ["m", "u", "l", ..] -> recurse(in, 3, tokens, Mul)
+    ["(", ..] -> recurse(in, 1, tokens, LParen)
+    [")", ..] -> recurse(in, 1, tokens, RParen)
+    [",", ..] -> recurse(in, 1, tokens, Comma)
+    [s, ..] -> {
+      case is_digit(s) {
+        True -> {
+          let digits =
+            in
+            |> list.take(up_to: 3)
+            |> list.take_while(is_digit)
+            |> string.join("")
+          let assert Ok(n) = int.parse(digits)
+          recurse(in, string.length(digits), tokens, Number(n))
+        }
+        False -> recurse(in, 1, tokens, Garbage(s))
+      }
     }
-    _ -> {
-      let s = string.slice(in, at_index: 0, length: 1)
-      recurse(in, s, tokens, Garbage(s))
-    }
+  }
+}
+
+fn is_digit(s: String) -> Bool {
+  case s {
+    "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" -> True
+    _ -> False
   }
 }
 
@@ -113,6 +114,7 @@ pub fn part2(filepath: String) -> Result(Int, DayError) {
   )
 
   content
+  |> string.to_graphemes
   |> tokenize([])
   |> compute(True)
   |> Ok
