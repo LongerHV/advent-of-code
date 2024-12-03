@@ -58,18 +58,11 @@ fn parse_mul(in: String) -> #(option.Option(#(Int, Int)), String) {
 
 fn parse(in: String, do: Bool, pairs: List(#(Int, Int))) -> List(#(Int, Int)) {
   case in {
-    "mul(" <> _ -> {
-      case do {
-        True -> {
-          let #(p, rest) = {
-            parse_mul(in)
-          }
-          case p {
-            option.Some(pp) -> parse(rest, do, list.append(pairs, [pp]))
-            option.None -> parse(rest, do, list.append(pairs, []))
-          }
-        }
-        False -> parse(string.slice(in, 1, string.length(in) - 1), do, pairs)
+    "mul(" <> _ if do -> {
+      let #(p, rest) = parse_mul(in)
+      case p {
+        option.Some(pp) -> parse(rest, do, list.append(pairs, [pp]))
+        option.None -> parse(rest, do, list.append(pairs, []))
       }
     }
     "do()" <> rest -> parse(rest, True, pairs)
