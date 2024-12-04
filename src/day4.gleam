@@ -1,3 +1,4 @@
+import gleam/bool
 import gleam/int
 import gleam/list
 import gleam/result
@@ -21,8 +22,8 @@ fn count_xmas_in_row(in: List(String)) -> Int {
   |> int.sum
 }
 
-fn count_diagonal_xmas(in: List(List(String))) -> Int {
-  in
+fn count_diagonal_xmas(array: List(List(String))) -> Int {
+  array
   |> list.window(4)
   |> list.map(fn(v_window) {
     v_window
@@ -49,21 +50,58 @@ fn count_diagonal_xmas(in: List(List(String))) -> Int {
   |> int.sum
 }
 
-pub fn part1(filepath: String) -> Result(Int, DayError) {
+fn read_array(filepath: String) -> Result(List(List(String)), DayError) {
   use content <- result.try(
     filepath
     |> simplifile.read
     |> result.map_error(ReadError),
   )
+  content
+  |> string.trim_end
+  |> string.split("\n")
+  |> list.map(string.to_graphemes)
+  |> Ok
+}
 
-  let array =
-    content
-    |> string.trim_end
-    |> string.split("\n")
-    |> list.map(string.to_graphemes)
+pub fn part1(filepath: String) -> Result(Int, DayError) {
+  use array <- result.try(read_array(filepath))
 
   { array |> list.map(count_xmas_in_row) |> int.sum }
   + { array |> list.transpose |> list.map(count_xmas_in_row) |> int.sum }
   + { array |> count_diagonal_xmas }
+  |> Ok
+}
+
+pub fn part2(filepath: String) -> Result(Int, DayError) {
+  use array <- result.try(read_array(filepath))
+
+  array
+  |> list.window(3)
+  |> list.map(fn(v_window) {
+    v_window
+    |> list.map(list.window(_, 3))
+    |> list.transpose
+    |> list.map(fn(h_window) {
+      bool.and(
+        {
+          case h_window {
+            [["M", _, _], [_, "A", _], [_, _, "S"]] -> True
+            [["S", _, _], [_, "A", _], [_, _, "M"]] -> True
+            _ -> False
+          }
+        },
+        {
+          case h_window {
+            [[_, _, "M"], [_, "A", _], ["S", _, _]] -> True
+            [[_, _, "S"], [_, "A", _], ["M", _, _]] -> True
+            _ -> False
+          }
+        },
+      )
+    })
+    |> list.map(bool.to_int)
+    |> int.sum
+  })
+  |> int.sum
   |> Ok
 }
