@@ -2,6 +2,7 @@ import gleam/dict
 import gleam/function
 import gleam/int
 import gleam/list
+import gleam/order
 import gleam/pair
 import gleam/result
 import gleam/set
@@ -123,6 +124,50 @@ pub fn part1(filepath: String) -> Result(Int, DayError) {
 
     case is_good {
       Ok(True) -> edit
+      _ -> []
+    }
+  })
+  |> list.filter(fn(l) { !list.is_empty(l) })
+  |> list.map(list_mid)
+  |> int.sum
+  |> Ok
+}
+
+pub fn part2(filepath: String) -> Result(Int, DayError) {
+  use #(rules, edits) <- result.try(read_file(filepath))
+  let rules_by_first = list.group(rules, by: pair.first)
+  let rules_by_second = list.group(rules, by: pair.second)
+  let rules_set = set.from_list(rules)
+
+  let fixup = fn(edit: List(Int)) -> List(Int) {
+    edit
+    |> list.sort(fn(a, b) {
+      case set.contains(rules_set, #(a, b)), set.contains(rules_set, #(b, a)) {
+        True, False -> order.Lt
+        False, True -> order.Gt
+        _, _ -> panic
+      }
+    })
+  }
+
+  edits
+  |> list.map(fn(edit) {
+    let page_set = set.from_list(edit)
+    let page_indexes = make_indexes_dict(edit)
+    let is_good =
+      edit
+      |> list.map(fn(page) {
+        page
+        |> find_applicable_rules(page_set, rules_by_first, rules_by_second)
+        |> list.map(check_rule(_, page_indexes))
+        |> result.all
+        |> result.map(list.all(_, function.identity))
+      })
+      |> result.all
+      |> result.map(list.all(_, function.identity))
+
+    case is_good {
+      Ok(False) -> fixup(edit)
       _ -> []
     }
   })
