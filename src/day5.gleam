@@ -21,25 +21,32 @@ fn list_at(l: List(any), index: Int) {
   }
 }
 
-pub fn part1(filepath: String) -> Result(Int, DayError) {
+fn list_mid(l: List(typevar)) -> typevar {
+  list_at(l, list.length(l) / 2)
+}
+
+fn read_file(filepath: String) {
   use content <- result.try(
     filepath
     |> simplifile.read
     |> result.map_error(ReadError),
   )
 
-  let assert [rules_content, edits_content] =
-    content
-    |> string.split(on: "\n\n")
+  let assert [rules_content, edits_content] = string.split(content, on: "\n\n")
 
   use rules <- result.try(
     rules_content
     |> string.trim
     |> string.split(on: "\n")
     |> list.map(fn(s) {
-      use a <- result.try(int.parse(string.slice(s, 0, 2)))
-      use b <- result.try(int.parse(string.slice(s, 3, 2)))
-      Ok(#(a, b))
+      case string.split(s, on: "|") {
+        [a, b] -> {
+          use a <- result.try(int.parse(a))
+          use b <- result.try(int.parse(b))
+          Ok(#(a, b))
+        }
+        _ -> Error(Nil)
+      }
     })
     |> result.all
     |> result.map_error(NilError),
@@ -59,35 +66,55 @@ pub fn part1(filepath: String) -> Result(Int, DayError) {
     |> result.map_error(NilError),
   )
 
+  Ok(#(rules, edits))
+}
+
+fn make_indexes_dict(list: List(any)) -> dict.Dict(any, Int) {
+  list
+  |> list.index_map(fn(element, index) { #(element, index) })
+  |> dict.from_list
+}
+
+fn check_rule(rule: #(Int, Int), indexes) -> Result(Bool, Nil) {
+  let #(a, b) = rule
+  use a_index <- result.try(dict.get(indexes, a))
+  use b_index <- result.try(dict.get(indexes, b))
+  Ok(a_index < b_index)
+}
+
+fn find_applicable_rules(
+  page: Int,
+  pages: set.Set(Int),
+  rules_left: dict.Dict(Int, List(#(Int, Int))),
+  rules_right: dict.Dict(Int, List(#(Int, Int))),
+) -> List(#(Int, Int)) {
+  let filter_rules = fn(rules, pair_element) {
+    rules
+    |> dict.get(page)
+    |> result.unwrap([])
+    |> list.filter(fn(r) { set.contains(pages, pair_element(r)) })
+  }
+  list.append(
+    filter_rules(rules_left, pair.second),
+    filter_rules(rules_right, pair.first),
+  )
+}
+
+pub fn part1(filepath: String) -> Result(Int, DayError) {
+  use #(rules, edits) <- result.try(read_file(filepath))
   let rules_by_first = list.group(rules, by: pair.first)
   let rules_by_second = list.group(rules, by: pair.second)
 
   edits
   |> list.map(fn(edit) {
     let page_set = set.from_list(edit)
-    let page_indexes =
-      edit
-      |> list.index_map(fn(page, index) { #(page, index) })
-      |> dict.from_list
+    let page_indexes = make_indexes_dict(edit)
     let is_good =
       edit
       |> list.map(fn(page) {
-        let a = result.unwrap(dict.get(rules_by_first, page), [])
-        let b = result.unwrap(dict.get(rules_by_second, page), [])
-        let aa =
-          a
-          |> list.filter(fn(x) { set.contains(page_set, pair.second(x)) })
-        let bb =
-          b
-          |> list.filter(fn(x) { set.contains(page_set, pair.first(x)) })
-        let applicable_rules = list.append(aa, bb)
-        applicable_rules
-        |> list.map(fn(rule) {
-          let #(a, b) = rule
-          use a_index <- result.try(dict.get(page_indexes, a))
-          use b_index <- result.try(dict.get(page_indexes, b))
-          Ok(a_index < b_index)
-        })
+        page
+        |> find_applicable_rules(page_set, rules_by_first, rules_by_second)
+        |> list.map(check_rule(_, page_indexes))
         |> result.all
         |> result.map(list.all(_, function.identity))
       })
@@ -100,7 +127,7 @@ pub fn part1(filepath: String) -> Result(Int, DayError) {
     }
   })
   |> list.filter(fn(l) { !list.is_empty(l) })
-  |> list.map(fn(l) { list_at(l, list.length(l) / 2) })
+  |> list.map(list_mid)
   |> int.sum
   |> Ok
 }
