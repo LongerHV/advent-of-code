@@ -43,28 +43,73 @@ fn read_input(filepath: String) -> Result(List(#(Int, List(Int))), DayError) {
   |> result.map_error(NilError)
 }
 
-pub fn check_equation(result: Int, current: Int, numbers: List(Int)) -> Bool {
+pub fn check_equation(
+  operators: List(fn(Int, Int) -> Int),
+  result: Int,
+  current: Int,
+  numbers: List(Int),
+) -> Bool {
+  let recurse = fn(c, n) { check_equation(operators, result, c, n) }
   {
     case current, numbers {
       _, [] -> current == result
       _, [n, ..rest] ->
-        check_equation(result, n + current, rest)
-        || check_equation(result, n * current, rest)
+        list.fold(operators, False, fn(acc, combine) {
+          acc || recurse(combine(current, n), rest)
+        })
     }
   }
+}
+
+fn solve(data, operators) {
+  data
+  |> list.map(fn(x) {
+    let #(result, numbers) = x
+    case check_equation(operators, result, 0, numbers) {
+      True -> result
+      False -> 0
+    }
+  })
+  |> int.sum
+}
+
+fn count_digits(number: Int) -> Int {
+  // This is faster than converting to string
+  case number {
+    n if n < 10 -> 1
+    n if n < 100 -> 2
+    n if n < 1000 -> 3
+    n -> n |> int.to_string |> string.length
+  }
+}
+
+fn power_of_ten(exp: Int) -> Int {
+  // This is faster than int.power or int.repeat |> int.product
+  case exp {
+    1 -> 10
+    2 -> 100
+    3 -> 1000
+    e -> e |> list.repeat(10, _) |> int.product
+  }
+}
+
+fn int_concat(a: Int, b: Int) -> Int {
+  let l = b |> count_digits |> power_of_ten
+  a * l + b
 }
 
 pub fn part1(filepath: String) -> Result(Int, DayError) {
   use data <- result.try(read_input(filepath))
 
   data
-  |> list.map(fn(x) {
-    let #(result, numbers) = x
-    case check_equation(result, 0, numbers) {
-      True -> result
-      False -> 0
-    }
-  })
-  |> int.sum
+  |> solve([int.add, int.multiply])
+  |> Ok
+}
+
+pub fn part2(filepath: String) -> Result(Int, DayError) {
+  use data <- result.try(read_input(filepath))
+
+  data
+  |> solve([int.add, int.multiply, int_concat])
   |> Ok
 }
