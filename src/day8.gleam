@@ -1,6 +1,4 @@
 import gleam/dict
-import gleam/int
-import gleam/io
 import gleam/list
 import gleam/option
 import gleam/result
@@ -10,6 +8,23 @@ import simplifile
 pub type DayError {
   ReadError(simplifile.FileError)
   NilError(Nil)
+}
+
+fn pair_add(a: #(Int, Int), b: #(Int, Int)) -> #(Int, Int) {
+  let #(x1, y1) = a
+  let #(x2, y2) = b
+  #(x1 + x2, y1 + y2)
+}
+
+fn pair_sub(a: #(Int, Int), b: #(Int, Int)) -> #(Int, Int) {
+  let #(x1, y1) = a
+  let #(x2, y2) = b
+  #(x1 - x2, y1 - y2)
+}
+
+fn pair_invert(a: #(Int, Int)) -> #(Int, Int) {
+  let #(x, y) = a
+  #(-x, -y)
 }
 
 fn read_input(filepath: String) {
@@ -53,19 +68,12 @@ fn read_input(filepath: String) {
   Ok(#(groups, #(rows, cols)))
 }
 
-pub fn part1(filepath: String) -> Result(Int, DayError) {
-  use #(groups, #(rows, cols)) <- result.try(read_input(filepath))
-
+fn solve(groups, rows, cols, collect) {
   groups
   |> dict.map_values(with: fn(_, v) {
     v
     |> list.combination_pairs
-    |> list.map(fn(points) {
-      let #(#(x1, y1), #(x2, y2)) = points
-      let dx = x2 - x1
-      let dy = y2 - y1
-      [#(x2 + dx, y2 + dy), #(x1 - dx, y1 - dy)]
-    })
+    |> list.map(collect)
     |> list.flatten
   })
   |> dict.values
@@ -77,4 +85,43 @@ pub fn part1(filepath: String) -> Result(Int, DayError) {
   })
   |> list.length
   |> Ok
+}
+
+pub fn part1(filepath: String) -> Result(Int, DayError) {
+  use #(groups, #(rows, cols)) <- result.try(read_input(filepath))
+
+  solve(groups, rows, cols, fn(points) {
+    let #(p1, p2) = points
+    let d = pair_sub(p2, p1)
+    [pair_add(p2, d), pair_sub(p1, d)]
+  })
+}
+
+fn find_nodes(
+  start: #(Int, Int),
+  delta: #(Int, Int),
+  rows: Int,
+  cols: Int,
+) -> List(#(Int, Int)) {
+  let recurse = fn(s) { find_nodes(s, delta, rows, cols) }
+  case pair_add(start, delta) {
+    #(x, y) as next if x >= 0 && x < rows && y >= 0 && y < cols -> [
+      start,
+      ..recurse(next)
+    ]
+    _ -> [start]
+  }
+}
+
+pub fn part2(filepath: String) -> Result(Int, DayError) {
+  use #(groups, #(rows, cols)) <- result.try(read_input(filepath))
+
+  solve(groups, rows, cols, fn(points) {
+    let #(p1, p2) = points
+    let d = pair_sub(p2, p1)
+    list.append(
+      find_nodes(p1, d, rows, cols),
+      find_nodes(p2, pair_invert(d), rows, cols),
+    )
+  })
 }
