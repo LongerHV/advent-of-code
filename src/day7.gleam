@@ -1,5 +1,6 @@
 import gleam/int
 import gleam/list
+import gleam/otp/task
 import gleam/result
 import gleam/string
 import simplifile
@@ -7,6 +8,7 @@ import simplifile
 pub type DayError {
   ReadError(simplifile.FileError)
   NilError(Nil)
+  AwaitError(task.AwaitError)
 }
 
 fn read_input(filepath: String) -> Result(List(#(Int, List(Int))), DayError) {
@@ -64,13 +66,18 @@ pub fn check_equation(
 fn solve(data, operators) {
   data
   |> list.map(fn(x) {
-    let #(result, numbers) = x
-    case check_equation(operators, result, 0, numbers) {
-      True -> result
-      False -> 0
-    }
+    task.async(fn() {
+      let #(result, numbers) = x
+      case check_equation(operators, result, 0, numbers) {
+        True -> result
+        False -> 0
+      }
+    })
   })
-  |> int.sum
+  |> task.try_await_all(1000)
+  |> result.all
+  |> result.map(int.sum)
+  |> result.map_error(AwaitError)
 }
 
 fn count_digits(number: Int) -> Int {
@@ -103,7 +110,6 @@ pub fn part1(filepath: String) -> Result(Int, DayError) {
 
   data
   |> solve([int.add, int.multiply])
-  |> Ok
 }
 
 pub fn part2(filepath: String) -> Result(Int, DayError) {
@@ -111,5 +117,4 @@ pub fn part2(filepath: String) -> Result(Int, DayError) {
 
   data
   |> solve([int.add, int.multiply, int_concat])
-  |> Ok
 }
