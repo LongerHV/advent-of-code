@@ -2,6 +2,7 @@ import argv
 import day1
 import day2
 import day3
+import day9
 import gleam/int
 import gleam/io
 import gleam/result
@@ -18,6 +19,7 @@ pub fn main() {
     "2", "1" -> day2.part1(filepath) |> result.replace_error(Nil)
     "2", "2" -> day2.part2(filepath) |> result.replace_error(Nil)
     "3", "2" -> day3.part2(filepath) |> result.replace_error(Nil)
+    "9", "1" -> day9.part1(filepath) |> result.replace_error(Nil)
     _, _ -> panic as "Not yet implemented"
   }
 
