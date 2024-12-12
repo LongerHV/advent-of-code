@@ -1,5 +1,6 @@
 import argv
 import day1
+import day11
 import day2
 import day3
 import day4
@@ -32,6 +33,7 @@ pub fn main() {
     "8", "1" -> day8.part1(filepath)
     "8", "2" -> day8.part2(filepath)
     "9", "1" -> day9.part1(filepath)
+    "11", "1" -> day11.part1(filepath)
     _, _ -> panic as "Not yet implemented"
   }
 
