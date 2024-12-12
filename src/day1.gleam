@@ -1,3 +1,4 @@
+import error
 import gleam/int
 import gleam/list
 import gleam/pair
@@ -5,16 +6,11 @@ import gleam/result
 import gleam/string
 import simplifile
 
-pub type Error {
-  ReadError(simplifile.FileError)
-  NilError(Nil)
-}
-
-fn read_file(filepath: String) -> Result(List(List(Int)), Error) {
+fn read_file(filepath: String) -> Result(List(List(Int)), error.AocError) {
   use content <- result.try(
     filepath
     |> simplifile.read
-    |> result.map_error(ReadError),
+    |> result.map_error(error.ReadError),
   )
 
   content
@@ -25,23 +21,23 @@ fn read_file(filepath: String) -> Result(List(List(Int)), Error) {
   |> result.all
 }
 
-fn map_parse_int(in: List(String)) -> Result(List(Int), Error) {
+fn map_parse_int(in: List(String)) -> Result(List(Int), error.AocError) {
   in
   |> list.map(int.parse)
   |> result.all
-  |> result.map_error(NilError)
+  |> result.map_error(error.NilError)
 }
 
-fn convert_to_tuple(in: List(typevar)) -> Result(#(typevar, typevar), Error) {
+fn convert_to_tuple(in: List(typevar)) -> Result(#(typevar, typevar), error.AocError) {
   case in {
     [a, b] -> Ok(pair.new(a, b))
-    _ -> Nil |> Error |> result.map_error(NilError)
+    _ -> Nil |> Error |> result.map_error(error.NilError)
   }
 }
 
 fn map_convert_to_tuple(
   in: List(List(typevar)),
-) -> Result(List(#(typevar, typevar)), Error) {
+) -> Result(List(#(typevar, typevar)), error.AocError) {
   in
   |> list.map(convert_to_tuple)
   |> result.all
@@ -51,7 +47,7 @@ fn distance(in: #(Int, Int)) -> Int {
   int.absolute_value(pair.first(in) - pair.second(in))
 }
 
-pub fn part1(filepath: String) -> Result(Int, Error) {
+pub fn part1(filepath: String) -> Result(Int, error.AocError) {
   use data <- result.try(read_file(filepath))
 
   data
@@ -64,7 +60,7 @@ pub fn part1(filepath: String) -> Result(Int, Error) {
   |> result.map(int.sum)
 }
 
-pub fn part2(filepath: String) -> Result(Int, Error) {
+pub fn part2(filepath: String) -> Result(Int, error.AocError) {
   let data =
     filepath
     |> read_file()

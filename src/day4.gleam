@@ -1,14 +1,10 @@
+import error
 import gleam/bool
 import gleam/int
 import gleam/list
 import gleam/result
 import gleam/string
 import simplifile
-
-pub type DayError {
-  ReadError(simplifile.FileError)
-  NilError(Nil)
-}
 
 fn count_xmas_in_row(in: List(String)) -> Int {
   in
@@ -50,11 +46,11 @@ fn count_diagonal_xmas(array: List(List(String))) -> Int {
   |> int.sum
 }
 
-fn read_array(filepath: String) -> Result(List(List(String)), DayError) {
+fn read_array(filepath: String) -> Result(List(List(String)), error.AocError) {
   use content <- result.try(
     filepath
     |> simplifile.read
-    |> result.map_error(ReadError),
+    |> result.map_error(error.ReadError),
   )
   content
   |> string.trim_end
@@ -63,7 +59,7 @@ fn read_array(filepath: String) -> Result(List(List(String)), DayError) {
   |> Ok
 }
 
-pub fn part1(filepath: String) -> Result(Int, DayError) {
+pub fn part1(filepath: String) -> Result(Int, error.AocError) {
   use array <- result.try(read_array(filepath))
 
   { array |> list.map(count_xmas_in_row) |> int.sum }
@@ -72,7 +68,7 @@ pub fn part1(filepath: String) -> Result(Int, DayError) {
   |> Ok
 }
 
-pub fn part2(filepath: String) -> Result(Int, DayError) {
+pub fn part2(filepath: String) -> Result(Int, error.AocError) {
   use array <- result.try(read_array(filepath))
 
   array

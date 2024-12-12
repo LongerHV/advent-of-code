@@ -1,14 +1,10 @@
+import error
 import gleam/dict
 import gleam/list
 import gleam/option
 import gleam/result
 import gleam/string
 import simplifile
-
-pub type DayError {
-  ReadError(simplifile.FileError)
-  NilError(Nil)
-}
 
 fn pair_add(a: #(Int, Int), b: #(Int, Int)) -> #(Int, Int) {
   let #(x1, y1) = a
@@ -31,7 +27,7 @@ fn read_input(filepath: String) {
   use content <- result.try(
     filepath
     |> simplifile.read
-    |> result.map_error(ReadError),
+    |> result.map_error(error.ReadError),
   )
 
   let lines =
@@ -87,7 +83,7 @@ fn solve(groups, rows, cols, collect) {
   |> Ok
 }
 
-pub fn part1(filepath: String) -> Result(Int, DayError) {
+pub fn part1(filepath: String) -> Result(Int, error.AocError) {
   use #(groups, #(rows, cols)) <- result.try(read_input(filepath))
 
   solve(groups, rows, cols, fn(points) {
@@ -113,7 +109,7 @@ fn find_nodes(
   }
 }
 
-pub fn part2(filepath: String) -> Result(Int, DayError) {
+pub fn part2(filepath: String) -> Result(Int, error.AocError) {
   use #(groups, #(rows, cols)) <- result.try(read_input(filepath))
 
   solve(groups, rows, cols, fn(points) {

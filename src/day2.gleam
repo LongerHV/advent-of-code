@@ -1,3 +1,4 @@
+import error
 import gleam/function
 import gleam/int
 import gleam/list
@@ -15,16 +16,11 @@ type Row =
 type Pairs =
   List(#(Int, Int))
 
-pub type Error {
-  ReadError(simplifile.FileError)
-  NilError(Nil)
-}
-
-fn read_file(filepath: String) -> Result(Array, Error) {
+fn read_file(filepath: String) -> Result(Array, error.AocError) {
   use content <- result.try(
     filepath
     |> simplifile.read
-    |> result.map_error(ReadError),
+    |> result.map_error(error.ReadError),
   )
 
   content
@@ -35,11 +31,11 @@ fn read_file(filepath: String) -> Result(Array, Error) {
   |> result.all
 }
 
-fn map_parse_int(in: List(String)) -> Result(List(Int), Error) {
+fn map_parse_int(in: List(String)) -> Result(List(Int), error.AocError) {
   in
   |> list.map(int.parse)
   |> result.all
-  |> result.map_error(NilError)
+  |> result.map_error(error.NilError)
 }
 
 fn is_ascending(row: Pairs) -> Bool {
@@ -60,7 +56,7 @@ fn is_descending(row: Pairs) -> Bool {
   |> list.all(function.identity)
 }
 
-pub fn part1(filepath: String) -> Result(Int, Error) {
+pub fn part1(filepath: String) -> Result(Int, error.AocError) {
   use data <- result.try(read_file(filepath))
 
   data
@@ -88,7 +84,7 @@ fn is_safe_with_toleration(in: Row, check: fn(Pairs) -> Bool) -> Bool {
   |> list.any(function.identity)
 }
 
-pub fn part2(filepath: String) -> Result(Int, Error) {
+pub fn part2(filepath: String) -> Result(Int, error.AocError) {
   use data <- result.try(read_file(filepath))
 
   data

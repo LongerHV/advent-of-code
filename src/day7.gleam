@@ -1,3 +1,4 @@
+import error
 import gleam/int
 import gleam/list
 import gleam/otp/task
@@ -5,17 +6,11 @@ import gleam/result
 import gleam/string
 import simplifile
 
-pub type DayError {
-  ReadError(simplifile.FileError)
-  NilError(Nil)
-  AwaitError(task.AwaitError)
-}
-
-fn read_input(filepath: String) -> Result(List(#(Int, List(Int))), DayError) {
+fn read_input(filepath: String) -> Result(List(#(Int, List(Int))), error.AocError) {
   use content <- result.try(
     filepath
     |> simplifile.read
-    |> result.map_error(ReadError),
+    |> result.map_error(error.ReadError),
   )
 
   content
@@ -42,7 +37,7 @@ fn read_input(filepath: String) -> Result(List(#(Int, List(Int))), DayError) {
     }
   })
   |> result.all
-  |> result.map_error(NilError)
+  |> result.map_error(error.NilError)
 }
 
 pub fn check_equation(
@@ -77,7 +72,7 @@ fn solve(data, operators) {
   |> task.try_await_all(1000)
   |> result.all
   |> result.map(int.sum)
-  |> result.map_error(AwaitError)
+  |> result.map_error(error.AwaitError)
 }
 
 fn count_digits(number: Int) -> Int {
@@ -105,14 +100,14 @@ fn int_concat(a: Int, b: Int) -> Int {
   a * l + b
 }
 
-pub fn part1(filepath: String) -> Result(Int, DayError) {
+pub fn part1(filepath: String) -> Result(Int, error.AocError) {
   use data <- result.try(read_input(filepath))
 
   data
   |> solve([int.add, int.multiply])
 }
 
-pub fn part2(filepath: String) -> Result(Int, DayError) {
+pub fn part2(filepath: String) -> Result(Int, error.AocError) {
   use data <- result.try(read_input(filepath))
 
   data

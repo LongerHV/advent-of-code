@@ -1,3 +1,4 @@
+import error
 import gleam/int
 import gleam/list
 import gleam/option.{type Option, None, Some}
@@ -5,16 +6,11 @@ import gleam/result
 import gleam/string
 import simplifile
 
-pub type DayError {
-  ReadError(simplifile.FileError)
-  NilError(Nil)
-}
-
-fn read_file(filepath: String) -> Result(List(Int), DayError) {
+fn read_file(filepath: String) -> Result(List(Int), error.AocError) {
   use content <- result.try(
     filepath
     |> simplifile.read
-    |> result.map_error(ReadError),
+    |> result.map_error(error.ReadError),
   )
 
   content
@@ -22,7 +18,7 @@ fn read_file(filepath: String) -> Result(List(Int), DayError) {
   |> string.to_graphemes
   |> list.map(int.parse)
   |> result.all
-  |> result.map_error(NilError)
+  |> result.map_error(error.NilError)
 }
 
 fn checksum(blocks: List(Option(Int))) -> Int {
@@ -48,7 +44,7 @@ fn partition(in: List(Option(Int))) -> List(List(Option(Int))) {
   }
 }
 
-pub fn part1(filepath: String) -> Result(Int, DayError) {
+pub fn part1(filepath: String) -> Result(Int, error.AocError) {
   use content <- result.try(read_file(filepath))
 
   let layout_flat =

@@ -1,3 +1,4 @@
+import error
 import gleam/int
 import gleam/list
 import gleam/order
@@ -6,16 +7,11 @@ import gleam/set
 import gleam/string
 import simplifile
 
-pub type DayError {
-  ReadError(simplifile.FileError)
-  NilError(Nil)
-}
-
 fn read_file(filepath: String) {
   use content <- result.try(
     filepath
     |> simplifile.read
-    |> result.map_error(ReadError),
+    |> result.map_error(error.ReadError),
   )
 
   let assert [rules_content, edits_content] = string.split(content, on: "\n\n")
@@ -35,7 +31,7 @@ fn read_file(filepath: String) {
       }
     })
     |> result.all
-    |> result.map_error(NilError),
+    |> result.map_error(error.NilError),
   )
 
   use edits <- result.try(
@@ -49,7 +45,7 @@ fn read_file(filepath: String) {
       |> result.all
     })
     |> result.all
-    |> result.map_error(NilError),
+    |> result.map_error(error.NilError),
   )
 
   Ok(#(rules, edits))
@@ -82,7 +78,7 @@ fn solve(
   rules: List(#(Int, Int)),
   edits: List(List(Int)),
   compare: fn(List(Int), List(Int)) -> List(Int),
-) -> Result(Int, DayError) {
+) -> Result(Int, error.AocError) {
   edits
   |> list.map(fn(edit) {
     let fixed_edit = fixup(edit, set.from_list(rules))
@@ -94,7 +90,7 @@ fn solve(
   |> Ok
 }
 
-pub fn part1(filepath: String) -> Result(Int, DayError) {
+pub fn part1(filepath: String) -> Result(Int, error.AocError) {
   use #(rules, edits) <- result.try(read_file(filepath))
   solve(rules, edits, fn(edit, fixed_edit) {
     case edit == fixed_edit {
@@ -104,7 +100,7 @@ pub fn part1(filepath: String) -> Result(Int, DayError) {
   })
 }
 
-pub fn part2(filepath: String) -> Result(Int, DayError) {
+pub fn part2(filepath: String) -> Result(Int, error.AocError) {
   use #(rules, edits) <- result.try(read_file(filepath))
   solve(rules, edits, fn(edit, fixed_edit) {
     case edit == fixed_edit {
