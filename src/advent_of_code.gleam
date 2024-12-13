@@ -1,6 +1,7 @@
 import argv
 import day1
 import day11
+import day13
 import day2
 import day3
 import day4
@@ -8,6 +9,7 @@ import day5
 import day7
 import day8
 import day9
+import error
 import gleam/int
 import gleam/io
 
@@ -35,11 +37,14 @@ pub fn main() {
     "9", "1" -> day9.part1(filepath)
     "11", "1" -> day11.part1(filepath)
     "11", "2" -> day11.part2(filepath)
+    "13", "1" -> day13.part1(filepath)
     _, _ -> panic as "Not yet implemented"
   }
 
   case r {
     Ok(a) -> io.println(int.to_string(a))
+    Error(error.ParseError(s)) -> panic as s
+    Error(error.NilError(Nil)) -> panic as "Nil Error"
     Error(_) -> panic as "Error"
   }
 }
