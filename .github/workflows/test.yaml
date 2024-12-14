@@ -19,5 +19,7 @@ jobs:
         env:
           GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
         run: ./decrypt_inputs.sh
+      - name: Run type checker
+        run: gleam check
       - name: Run tests
         run: gleam test
