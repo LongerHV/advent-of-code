@@ -41,6 +41,7 @@ pub fn main() {
     "13", "1" -> day13.part1(filepath)
     "13", "2" -> day13.part2(filepath)
     "14", "1" -> day14.part1(filepath)
+    "14", "2" -> day14.part2(filepath)
     _, _ -> panic as "Not yet implemented"
   }
 

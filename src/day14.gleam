@@ -1,9 +1,15 @@
 import error
+import gleam/bit_array
 import gleam/int
 import gleam/list
+import gleam/pair
 import gleam/result
+import gleam/set
 import gleam/string
+import gleam/string_tree
+import gleam/yielder
 import simplifile
+import util
 
 fn parse_vector(in: String) -> Result(#(Int, Int), error.AocError) {
   case string.split(in, "=") {
@@ -118,5 +124,55 @@ pub fn part1(filepath: String) -> Result(Int, error.AocError) {
     |> list.length
   })
   |> int.product
+  |> Ok
+}
+
+fn render_map(robots: List(#(Int, Int)), cols: Int, rows: Int) -> String {
+  let robots =
+    robots
+    |> set.from_list
+  list.range(0, rows)
+  |> list.map(fn(y) {
+    list.range(0, cols)
+    |> list.map(fn(x) {
+      case set.contains(robots, #(x, y)) {
+        True -> "#"
+        False -> "."
+      }
+    })
+    |> string_tree.from_strings
+  })
+  |> string_tree.join("")
+  |> string_tree.to_string
+}
+
+pub fn part2(filepath: String) -> Result(Int, error.AocError) {
+  let entropy_threshold = 500
+  use content <- result.try(
+    filepath
+    |> simplifile.read
+    |> result.map_error(error.ReadError),
+  )
+
+  use #(#(cols, rows), robots) <- result.try(parse_input(content))
+
+  robots
+  |> yielder.iterate(fn(robots) {
+    list.map(robots, fn(r) {
+      let #(_, velocity) = r
+      #(move_robot(r, rows, cols, 1), velocity)
+    })
+  })
+  |> yielder.take_while(fn(robots) {
+    let size =
+      robots
+      |> list.map(pair.first)
+      |> render_map(cols, rows)
+      |> util.compress_string
+      |> bit_array.byte_size
+
+    size > entropy_threshold
+  })
+  |> yielder.length
   |> Ok
 }
