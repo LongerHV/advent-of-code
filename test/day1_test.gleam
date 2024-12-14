@@ -8,7 +8,7 @@ pub fn part_1_example_test() {
 
 pub fn part_1_exercise_test() {
   day1.part1("data/day1_exercise.txt")
-  |> should.equal(Ok(2742123))
+  |> should.equal(Ok(2_742_123))
 }
 
 pub fn part_2_example_test() {
@@ -18,5 +18,5 @@ pub fn part_2_example_test() {
 
 pub fn part_2_exercise_test() {
   day1.part2("data/day1_exercise.txt")
-  |> should.equal(Ok(21328497))
+  |> should.equal(Ok(21_328_497))
 }

@@ -28,7 +28,9 @@ fn map_parse_int(in: List(String)) -> Result(List(Int), error.AocError) {
   |> result.map_error(error.NilError)
 }
 
-fn convert_to_tuple(in: List(typevar)) -> Result(#(typevar, typevar), error.AocError) {
+fn convert_to_tuple(
+  in: List(typevar),
+) -> Result(#(typevar, typevar), error.AocError) {
   case in {
     [a, b] -> Ok(pair.new(a, b))
     _ -> Nil |> Error |> result.map_error(error.NilError)

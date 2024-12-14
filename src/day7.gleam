@@ -6,7 +6,9 @@ import gleam/result
 import gleam/string
 import simplifile
 
-fn read_input(filepath: String) -> Result(List(#(Int, List(Int))), error.AocError) {
+fn read_input(
+  filepath: String,
+) -> Result(List(#(Int, List(Int))), error.AocError) {
   use content <- result.try(
     filepath
     |> simplifile.read
