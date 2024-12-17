@@ -77,13 +77,6 @@ fn parse_input(content: String) {
   }
 }
 
-fn mod(a, b) {
-  case a % b {
-    r if r >= 0 -> r
-    r -> b + r
-  }
-}
-
 fn move_robot(
   robot: #(#(Int, Int), #(Int, Int)),
   cols: Int,
@@ -91,7 +84,10 @@ fn move_robot(
   iterations: Int,
 ) -> #(Int, Int) {
   let #(#(px, py), #(vx, vy)) = robot
-  #(mod(px + { vx * iterations }, rows), mod(py + { vy * iterations }, cols))
+  #(
+    util.int_modulo(px + { vx * iterations }, rows),
+    util.int_modulo(py + { vy * iterations }, cols),
+  )
 }
 
 fn quadrants(cols: Int, rows: Int) -> List(#(#(Int, Int), #(Int, Int))) {

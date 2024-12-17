@@ -1,4 +1,3 @@
-import gleam/io
 import gleam/option.{None, Some}
 import gleeunit/should
 import util
@@ -15,6 +14,5 @@ pub fn nth_last_test() {
 
 pub fn nth_out_of_bound_test() {
   util.list_nth(2, [])
-  |> io.debug
   |> should.equal(None)
 }

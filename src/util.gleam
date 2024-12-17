@@ -28,3 +28,7 @@ pub fn list_nth(n: Int, list: List(typevar)) -> Option(typevar) {
     _ -> erl_list_nth(n + 1, list) |> Some
   }
 }
+
+pub fn int_modulo(a: Int, b: Int) -> Int {
+  { { a % b } + b } % b
+}
