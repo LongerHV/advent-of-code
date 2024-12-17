@@ -4,6 +4,7 @@ import day11
 import day13
 import day14
 import day15
+import day17
 import day2
 import day3
 import day4
@@ -44,6 +45,7 @@ pub fn main() {
     "14", "1" -> day14.part1(filepath)
     "14", "2" -> day14.part2(filepath)
     "15", "1" -> day15.part1(filepath)
+    "17", "1" -> day17.part1(filepath)
     _, _ -> panic as "Not yet implemented"
   }
 
