@@ -137,6 +137,18 @@ fn make_step(acc: #(Position, Map), step: Direction) -> #(Position, Map) {
   }
 }
 
+fn calculate_result(map: Map) -> Int {
+  map
+  |> dict.to_list
+  |> list.map(fn(obj) {
+    case obj {
+      #(#(x, y), Box) -> x + { 100 * y }
+      _ -> 0
+    }
+  })
+  |> int.sum
+}
+
 pub fn part1(filepath: String) -> Result(Int, error.AocError) {
   use content <- result.try(
     filepath
@@ -150,13 +162,110 @@ pub fn part1(filepath: String) -> Result(Int, error.AocError) {
   steps
   |> list.fold(#(robot, map), make_step)
   |> pair.second
-  |> dict.to_list
-  |> list.map(fn(obj) {
-    case obj {
-      #(#(x, y), Box) -> x + { 100 * y }
-      _ -> 0
+  |> calculate_result
+  |> Ok
+}
+
+fn parse_input2(in: String) -> Result(#(Map, List(Direction)), error.AocError) {
+  use #(map_data, steps_data) <- result.try({
+    let data =
+      in
+      |> string.trim
+      |> string.split("\n\n")
+    case data {
+      [a, b] -> Ok(#(a, b))
+      _ -> Error(error.ParseError("Invalid input"))
     }
   })
-  |> int.sum
+
+  let map = parse_map2(map_data)
+  let steps = parse_steps(steps_data)
+  Ok(#(map, steps))
+}
+
+fn parse_map2(in: String) -> Map {
+  in
+  |> string.split("\n")
+  |> list.index_map(fn(row, y) {
+    row
+    |> string.to_graphemes
+    |> list.index_map(fn(char, x) {
+      case char {
+        "@" -> [#(#(2 * x, y), Robot)]
+        "#" -> [#(#(2 * x, y), Wall), #(#(2 * x + 1, y), Wall)]
+        "O" -> [#(#(2 * x, y), Box)]
+        _ -> []
+      }
+    })
+    |> list.flatten
+  })
+  |> list.flatten
+  |> dict.from_list
+}
+
+fn make_step2(acc: #(Position, Map), step: Direction) -> #(Position, Map) {
+  let #(robot, map) = acc
+  let next = point.add(robot, step)
+
+  case dict.get(map, next) {
+    Ok(Box) -> {
+      case move_box2(next, step, map) {
+        #(True, new_map) -> #(next, new_map)
+        _ -> #(robot, map)
+      }
+    }
+    Ok(Wall) -> #(robot, map)
+    _ -> #(next, map)
+  }
+}
+
+fn move_box2(pos: Position, step: Direction, map: Map) -> #(Bool, Map) {
+  // let next = point.add(pos, step)
+  // case dict.get(map, next) {
+  //   Ok(Wall) -> #(False, map)
+  //   Ok(Box) -> {
+  //     case move_box(next, step, map) {
+  //       #(True, new_map) -> #(True, update_map(new_map, pos, next))
+  //       _ -> #(False, map)
+  //     }
+  //   }
+  //   _ -> #(True, update_map(map, pos, next))
+  // }
+
+  case step {
+    #(0, y) -> {
+      [
+        dict.get(map, point.add(pos, #(-1, y)))
+          |> result.map(fn(_) { #(-1, y) }),
+        dict.get(map, point.add(pos, #(0, y)))
+          |> result.map(fn(_) { #(-1, y) }),
+        dict.get(map, point.add(pos, #(1, y)))
+          |> result.map(fn(_) { #(-1, y) }),
+      ]
+      |> result.values
+      |> list.fold(map, fn(acc: Map, box: Position) { todo })
+    }
+    #(1, 0) -> todo
+    #(-1, 0) -> todo
+    _ -> panic
+  }
+
+  todo
+}
+
+pub fn part2(filepath: String) -> Result(Int, error.AocError) {
+  use content <- result.try(
+    filepath
+    |> simplifile.read
+    |> result.map_error(error.ReadError),
+  )
+
+  use #(map, steps) <- result.try(parse_input2(content))
+  use robot <- result.try(find_robot(map))
+
+  steps
+  |> list.fold(#(robot, map), make_step2)
+  |> pair.second
+  |> calculate_result
   |> Ok
 }
