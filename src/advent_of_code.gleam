@@ -4,6 +4,7 @@ import day11
 import day13
 import day14
 import day15
+import day17
 import day2
 import day3
 import day4
@@ -14,6 +15,7 @@ import day9
 import error
 import gleam/int
 import gleam/io
+import gleam/result
 
 pub fn main() {
   let #(day, part, filepath) = case argv.load().arguments {
@@ -22,33 +24,34 @@ pub fn main() {
   }
 
   let r = case day, part {
-    "1", "1" -> day1.part1(filepath)
-    "1", "2" -> day1.part2(filepath)
-    "2", "1" -> day2.part1(filepath)
-    "2", "2" -> day2.part2(filepath)
-    "3", "1" -> day3.part1(filepath)
-    "3", "2" -> day3.part2(filepath)
-    "4", "1" -> day4.part1(filepath)
-    "4", "2" -> day4.part2(filepath)
-    "5", "1" -> day5.part1(filepath)
-    "5", "2" -> day5.part2(filepath)
-    "7", "1" -> day7.part1(filepath)
-    "7", "2" -> day7.part2(filepath)
-    "8", "1" -> day8.part1(filepath)
-    "8", "2" -> day8.part2(filepath)
-    "9", "1" -> day9.part1(filepath)
-    "11", "1" -> day11.part1(filepath)
-    "11", "2" -> day11.part2(filepath)
-    "13", "1" -> day13.part1(filepath)
-    "13", "2" -> day13.part2(filepath)
-    "14", "1" -> day14.part1(filepath)
-    "14", "2" -> day14.part2(filepath)
-    "15", "1" -> day15.part1(filepath)
+    "1", "1" -> day1.part1(filepath) |> result.map(int.to_string)
+    "1", "2" -> day1.part2(filepath) |> result.map(int.to_string)
+    "2", "1" -> day2.part1(filepath) |> result.map(int.to_string)
+    "2", "2" -> day2.part2(filepath) |> result.map(int.to_string)
+    "3", "1" -> day3.part1(filepath) |> result.map(int.to_string)
+    "3", "2" -> day3.part2(filepath) |> result.map(int.to_string)
+    "4", "1" -> day4.part1(filepath) |> result.map(int.to_string)
+    "4", "2" -> day4.part2(filepath) |> result.map(int.to_string)
+    "5", "1" -> day5.part1(filepath) |> result.map(int.to_string)
+    "5", "2" -> day5.part2(filepath) |> result.map(int.to_string)
+    "7", "1" -> day7.part1(filepath) |> result.map(int.to_string)
+    "7", "2" -> day7.part2(filepath) |> result.map(int.to_string)
+    "8", "1" -> day8.part1(filepath) |> result.map(int.to_string)
+    "8", "2" -> day8.part2(filepath) |> result.map(int.to_string)
+    "9", "1" -> day9.part1(filepath) |> result.map(int.to_string)
+    "11", "1" -> day11.part1(filepath) |> result.map(int.to_string)
+    "11", "2" -> day11.part2(filepath) |> result.map(int.to_string)
+    "13", "1" -> day13.part1(filepath) |> result.map(int.to_string)
+    "13", "2" -> day13.part2(filepath) |> result.map(int.to_string)
+    "14", "1" -> day14.part1(filepath) |> result.map(int.to_string)
+    "14", "2" -> day14.part2(filepath) |> result.map(int.to_string)
+    "15", "1" -> day15.part1(filepath) |> result.map(int.to_string)
+    "17", "1" -> day17.part1(filepath)
     _, _ -> panic as "Not yet implemented"
   }
 
   case r {
-    Ok(a) -> io.println(int.to_string(a))
+    Ok(a) -> io.println(a)
     Error(error.ParseError(s)) -> panic as s
     Error(error.NilError(Nil)) -> panic as "Nil Error"
     Error(_) -> panic as "Error"
