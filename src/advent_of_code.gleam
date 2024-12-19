@@ -5,6 +5,7 @@ import day13
 import day14
 import day15
 import day17
+import day19
 import day2
 import day3
 import day4
@@ -47,6 +48,7 @@ pub fn main() {
     "14", "2" -> day14.part2(filepath) |> result.map(int.to_string)
     "15", "1" -> day15.part1(filepath) |> result.map(int.to_string)
     "17", "1" -> day17.part1(filepath)
+    "19", "1" -> day19.part1(filepath) |> result.map(int.to_string)
     _, _ -> panic as "Not yet implemented"
   }
 
