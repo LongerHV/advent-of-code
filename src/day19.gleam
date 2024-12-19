@@ -2,10 +2,12 @@ import error.{type AocError, ParseError}
 import gleam/bool
 import gleam/function
 import gleam/int
+import gleam/list
+import gleam/otp/task
 import gleam/result
 import gleam/string
 import gleam/yielder
-import rememo/memo
+import memo
 import simplifile
 
 fn parse_input(in: String) -> Result(#(List(String), List(String)), AocError) {
@@ -37,7 +39,6 @@ fn is_valid(design: String, patterns: List(String), cache) -> Bool {
           patterns,
           cache,
         )
-
       _ -> False
     }
   })
@@ -80,11 +81,14 @@ pub fn part1(filepath: String) -> Result(Int, AocError) {
   use cache <- memo.create()
 
   designs
-  |> yielder.from_list
-  |> yielder.map(is_valid(_, patterns, cache))
-  |> yielder.filter(function.identity)
-  |> yielder.length
-  |> Ok
+  |> list.map(fn(design) {
+    task.async(fn() { is_valid(design, patterns, cache) })
+  })
+  |> task.try_await_all(5000)
+  |> result.all
+  |> result.map_error(error.AwaitError)
+  |> result.map(list.filter(_, function.identity))
+  |> result.map(list.length(_))
 }
 
 pub fn part2(filepath: String) -> Result(Int, AocError) {
@@ -97,9 +101,11 @@ pub fn part2(filepath: String) -> Result(Int, AocError) {
   use cache <- memo.create()
 
   designs
-  |> yielder.from_list
-  |> yielder.map(count_valid(_, patterns, cache))
-  |> yielder.to_list
-  |> int.sum
-  |> Ok
+  |> list.map(fn(design) {
+    task.async(fn() { count_valid(design, patterns, cache) })
+  })
+  |> task.try_await_all(5000)
+  |> result.all
+  |> result.map_error(error.AwaitError)
+  |> result.map(int.sum)
 }

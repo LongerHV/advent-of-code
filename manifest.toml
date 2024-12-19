@@ -20,11 +20,13 @@ packages = [
 
 [requirements]
 argv = { version = ">= 1.0.2 and < 2.0.0" }
+carpenter = { version = ">= 0.3.1 and < 1.0.0" }
 gleam_erlang = { version = ">= 0.32.0 and < 1.0.0" }
 gleam_otp = { version = ">= 0.15.0 and < 1.0.0" }
 gleam_regexp = { version = ">= 1.0.0 and < 2.0.0" }
 gleam_stdlib = { version = ">= 0.34.0 and < 2.0.0" }
 gleam_yielder = { version = ">= 1.1.0 and < 2.0.0" }
 gleeunit = { version = ">= 1.0.0 and < 2.0.0" }
+gtempo = { version = ">= 5.1.2 and < 6.0.0" }
 rememo = { version = ">= 3.1.0 and < 4.0.0" }
 simplifile = { version = ">= 2.2.0 and < 3.0.0" }

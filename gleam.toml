@@ -21,6 +21,8 @@ gleam_regexp = ">= 1.0.0 and < 2.0.0"
 gleam_otp = ">= 0.15.0 and < 1.0.0"
 gleam_yielder = ">= 1.1.0 and < 2.0.0"
 rememo = ">= 3.1.0 and < 4.0.0"
+carpenter = ">= 0.3.1 and < 1.0.0"
+gtempo = ">= 5.1.2 and < 6.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
