@@ -95,7 +95,12 @@ pub fn part2(filepath: String) -> Result(Int, error.AocError) {
         },
       )
     })
-    |> list.map(bool.to_int)
+    |> list.map(fn(b) {
+      case b {
+        True -> 1
+        False -> 0
+      }
+    })
     |> int.sum
   })
   |> int.sum
