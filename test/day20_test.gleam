@@ -6,7 +6,7 @@ import gleeunit/should
 
 pub fn part_1_example_test() {
   day20.main("data/day20_example.txt")
-  |> result.map(day20.find_shortcuts1)
+  |> result.map(day20.find_shortcuts1(_, 1))
   |> result.map(list.sort(_, by: int.compare))
   |> should.equal(
     Ok([
@@ -23,8 +23,7 @@ pub fn part_1_exercise_test() {
 
 pub fn part_2_example_test() {
   day20.main("data/day20_example.txt")
-  |> result.map(day20.find_shortcuts2)
-  |> result.map(list.filter(_, fn(d) { d >= 50 }))
+  |> result.map(day20.find_shortcuts2(_, 50))
   |> result.map(list.length)
   |> should.equal(Ok(285))
 }

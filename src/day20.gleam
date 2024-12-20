@@ -2,13 +2,13 @@ import error.{type AocError, NilError, ParseError}
 import gleam/bool
 import gleam/dict
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/pair
 import gleam/result
 import gleam/set.{type Set}
 import gleam/string
+import parallel
 import point.{type Point}
 import simplifile
 
@@ -107,69 +107,69 @@ pub fn main(filepath: String) {
   |> Ok
 }
 
-pub fn find_shortcuts1(path: dict.Dict(#(Int, Int), Int)) -> List(Int) {
-  let step_size = 2
-  let directions = list.map(directions, fn(d) { point.mul(d, step_size) })
+fn find_shortcuts(
+  path: dict.Dict(Point, Int),
+  threshold: Int,
+  cheat: fn(Int, Point) -> List(option.Option(Int)),
+) -> List(Int) {
   path
   |> dict.keys
-  |> list.fold([], fn(acc, pos) {
+  |> parallel.map(group_by: fn(p) { p.0 % 16 }, with: fn(pos) {
     let assert Ok(current_distance) = dict.get(path, pos)
-    let shortcuts =
-      directions
-      |> list.map(fn(jump) {
-        let p = point.add(pos, jump)
-        case dict.get(path, p) {
-          Ok(distance) -> Some(distance - current_distance - step_size)
-          _ -> None
-        }
-      })
-    list.append(shortcuts, acc)
+    cheat(current_distance, pos)
   })
+  |> list.flatten
   |> option.values
-  |> list.filter(fn(d) { d > 0 })
+  |> list.filter(fn(d) { d >= threshold })
+}
+
+pub fn find_shortcuts1(path: dict.Dict(Point, Int), threshold: Int) -> List(Int) {
+  let step_size = 2
+  let directions = list.map(directions, fn(d) { point.mul(d, step_size) })
+  find_shortcuts(path, threshold, fn(current_distance, pos) {
+    directions
+    |> list.map(fn(jump) {
+      let p = point.add(pos, jump)
+      case dict.get(path, p) {
+        Ok(distance) -> Some(distance - current_distance - step_size)
+        _ -> None
+      }
+    })
+  })
 }
 
 pub fn part1(filepath: String) -> Result(Int, AocError) {
   use distances <- result.try(main(filepath))
   distances
-  |> find_shortcuts1
-  |> list.filter(fn(d) { d >= 100 })
+  |> find_shortcuts1(100)
   |> list.length
   |> Ok
 }
 
-pub fn find_shortcuts2(path: dict.Dict(#(Int, Int), Int)) -> List(Int) {
+pub fn find_shortcuts2(path: dict.Dict(Point, Int), threshold: Int) -> List(Int) {
   let max_cheat = 20
-  path
-  |> dict.keys
-  |> list.fold([], fn(acc, pos) {
-    let assert Ok(current_distance) = dict.get(path, pos)
-    let shortcuts =
-      path
-      |> dict.keys
-      |> list.map(fn(other) {
-        let d = point.sub(other, pos)
-        #(other, int.absolute_value(d.0) + int.absolute_value(d.1))
-      })
-      |> list.filter(fn(other) { other.1 <= max_cheat })
-      |> list.map(fn(x) {
-        let #(other, saved) = x
-        case dict.get(path, other) {
-          Ok(distance) -> Some(distance - current_distance - saved)
-          _ -> None
-        }
-      })
-    list.append(shortcuts, acc)
+  find_shortcuts(path, threshold, fn(current_distance, pos) {
+    path
+    |> dict.keys
+    |> list.map(fn(other) {
+      let d = point.sub(other, pos)
+      #(other, int.absolute_value(d.0) + int.absolute_value(d.1))
+    })
+    |> list.filter(fn(other) { other.1 <= max_cheat })
+    |> list.map(fn(x) {
+      let #(other, saved) = x
+      case dict.get(path, other) {
+        Ok(distance) -> Some(distance - current_distance - saved)
+        _ -> None
+      }
+    })
   })
-  |> option.values
-  |> list.filter(fn(d) { d >= 0 })
 }
 
 pub fn part2(filepath: String) -> Result(Int, AocError) {
   use distances <- result.try(main(filepath))
   distances
-  |> find_shortcuts2
-  |> list.filter(fn(d) { d >= 100 })
+  |> find_shortcuts2(100)
   |> list.length
   |> Ok
 }
