@@ -52,6 +52,7 @@ pub fn main() {
     "19", "1" -> day19.part1(filepath) |> result.map(int.to_string)
     "19", "2" -> day19.part2(filepath) |> result.map(int.to_string)
     "20", "1" -> day20.part1(filepath) |> result.map(int.to_string)
+    "20", "2" -> day20.part2(filepath) |> result.map(int.to_string)
     _, _ -> panic as "Not yet implemented"
   }
 

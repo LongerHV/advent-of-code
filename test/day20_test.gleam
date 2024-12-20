@@ -20,12 +20,16 @@ pub fn part_1_exercise_test() {
   day20.part1("data/day20_exercise.txt")
   |> should.equal(Ok(1360))
 }
-// pub fn part_2_example_test() {
-//   day20.part2("data/day20_example.txt")
-//   |> should.equal(Ok(16))
-// }
 
-// pub fn part_2_exercise_test() {
-//   day20.part2("data/day20_exercise.txt")
-//   |> should.equal(Ok(1_041_529_704_688_380))
-// }
+pub fn part_2_example_test() {
+  day20.main("data/day20_example.txt")
+  |> result.map(day20.find_shortcuts2)
+  |> result.map(list.filter(_, fn(d) { d >= 50 }))
+  |> result.map(list.length)
+  |> should.equal(Ok(285))
+}
+
+pub fn part_2_exercise_test() {
+  day20.part2("data/day20_exercise.txt")
+  |> should.equal(Ok(1_005_476))
+}
