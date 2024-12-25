@@ -8,6 +8,7 @@ import day17
 import day19
 import day2
 import day20
+import day24
 import day3
 import day4
 import day5
@@ -53,6 +54,7 @@ pub fn main() {
     "19", "2" -> day19.part2(filepath) |> result.map(int.to_string)
     "20", "1" -> day20.part1(filepath) |> result.map(int.to_string)
     "20", "2" -> day20.part2(filepath) |> result.map(int.to_string)
+    "24", "1" -> day24.part1(filepath) |> result.map(int.to_string)
     _, _ -> panic as "Not yet implemented"
   }
 
